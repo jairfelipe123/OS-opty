@@ -168,7 +168,7 @@
       width: 70px;
       height: 70px;
       background: #ccc;
-      border-radius: 18px;
+      border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       display: flex;
       flex-direction: column;
@@ -198,7 +198,7 @@
     }
 
     .app-icon-emoji {
-      font-size: 65px;
+      font-size: 30px;
       margin-bottom: 5px;
     }
 
@@ -305,7 +305,7 @@
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 280px;
+      width: 200px;
       height: 15px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 120px;
@@ -315,7 +315,7 @@
     }
 
     .home-button:active {
-      transform: translateX(-50%) scale(1.95);
+      transform: translateX(-50%) scale(0.900);
     }
 
     .overlay {
@@ -546,20 +546,9 @@
     <div class="settings-header">Ajustes</div>
     <div class="settings-list">
 
-      <div class="settings-item">
-        <label for="darkMode">Modo oscuro</label>
-        <input type="checkbox" id="darkMode" onchange="toggleDarkMode()">
-      </div>
 
-      <div class="settings-item">
-        <label>Fondo de Pantalla</label>
-        <input type="file" accept="image/*" onchange="uploadCustomWallpaper(event)">
-        <div class="wallpapers">
-          <img src="https://i.pinimg.com/736x/af/c6/6d/afc66d9445a1bb8cfb40d1a1cfa5b33f.jpg" onclick="setWallpaper(this.src)">
-          <img src="https://wallpapers.com/images/featured/iphone-wltnz5o1xymafqmo.jpg" onclick="setWallpaper(this.src)">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiUmN6zh-PyruRsLo1d0nJjFnMsFuGQw_suA&s" onclick="setWallpaper(this.src)">
-        </div>
-      </div>
+
+
 
       <div class="settings-item" onclick="openGeneral()">
         <label>General</label>
@@ -579,6 +568,22 @@
     <div class="settings-list">
       <div class="settings-item" onclick="openInfo()">
         <label>Información</label>
+      </div>
+
+
+            <div class="settings-item">
+        <label for="darkMode">Modo oscuro</label>
+        <input type="checkbox" id="darkMode" onchange="toggleDarkMode()">
+      </div>
+
+            <div class="settings-item">
+        <label>Fondo de Pantalla</label>
+        <input type="file" accept="image/*" onchange="uploadCustomWallpaper(event)">
+        <div class="wallpapers">
+          <img src="https://i.pinimg.com/736x/af/c6/6d/afc66d9445a1bb8cfb40d1a1cfa5b33f.jpg" onclick="setWallpaper(this.src)">
+          <img src="https://wallpapers.com/images/featured/iphone-wltnz5o1xymafqmo.jpg" onclick="setWallpaper(this.src)">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiUmN6zh-PyruRsLo1d0nJjFnMsFuGQw_suA&s" onclick="setWallpaper(this.src)">
+        </div>
       </div>
     </div>
     <div class="home-button" onclick="closeGeneral()"></div>
