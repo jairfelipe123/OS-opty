@@ -28,7 +28,7 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: url('https://i.imgur.com/IOa4yng.jpg') no-repeat center center;
+      background: url('https://cdn.ipadizate.com/2022/04/iPhone13ProMax-iPhone13Pro-iPhone13-iPhone13Mini-iPhone12ProMax-iPhone12Pro-iPhone12-iPhone12Mini-iPhone11ProMax-iPhone11-iPhone11Pro-iPhoneXSMax-iPhoneXR-iPhoneXS-iPhoneX-@AR72014-2.png') no-repeat center center;
       background-size: cover;
       height: 100vh;
       display: flex;
@@ -178,12 +178,12 @@
       text-align: center;
       cursor: pointer;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      transition: transform 0.2s, opacity 0.2s;
+      transition: transform 0.1s, opacity 0.1s;
       position: relative;
     }
 
     .app-icon:active {
-      transform: scale(0.85);
+      transform: scale(1.85);
     }
 
     .app-icon.launching {
@@ -198,7 +198,7 @@
     }
 
     .app-icon-emoji {
-      font-size: 35px;
+      font-size: 65px;
       margin-bottom: 5px;
     }
 
@@ -302,20 +302,20 @@
 
     .home-button {
       position: fixed;
-      bottom: 20px;
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 50px;
-      height: 5px;
+      width: 280px;
+      height: 15px;
       background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
+      border-radius: 120px;
       cursor: pointer;
       z-index: 160;
-      transition: transform 0.2s;
+      transition: transform 0.1s;
     }
 
     .home-button:active {
-      transform: translateX(-50%) scale(0.95);
+      transform: translateX(-50%) scale(1.95);
     }
 
     .overlay {
@@ -409,7 +409,7 @@
 
     /* Calculator Styles */
     #calculator-app {
-      background: #000;
+      background: #3d3d3d;
     }
 
     .calc-display {
@@ -427,7 +427,7 @@
     }
 
     .calc-buttons {
-      padding: 15px;
+      padding: 20px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
@@ -438,14 +438,14 @@
 
     .calc-btn {
       aspect-ratio: 1;
-      border-radius: 50%;
+      border-radius: 500%;
       border: none;
-      font-size: 28px;
-      font-weight: 400;
+      font-size: 60px;
+      font-weight: 40;
       cursor: pointer;
       transition: opacity 0.2s;
       color: white;
-      max-width: 85px;
+      max-width: 100px;
       max-height: 85px;
       justify-self: center;
     }
@@ -455,7 +455,7 @@
     }
 
     .calc-btn-number {
-      background: #333;
+      background: #000000;
     }
 
     .calc-btn-operator {
@@ -523,16 +523,6 @@
         </div>
       </div>
     </div>
-    
-    <div class="brightness-slider">
-      <div style="color: white; font-size: 12px; margin-bottom: 10px;">☀️ Brillo</div>
-      <input type="range" min="20" max="100" value="100" id="brightness-slider" oninput="adjustBrightness(this.value)">
-    </div>
-    
-    <div class="brightness-slider">
-      <div style="color: white; font-size: 12px; margin-bottom: 10px;">🔊 Volumen</div>
-      <input type="range" min="0" max="100" value="50" id="volume-slider">
-    </div>
   </div>
 
   <!-- Pantalla principal -->
@@ -545,7 +535,7 @@
       <div class="app-icon-emoji">🧭</div>
       <span>Safari</span>
     </div>
-    <div class="app-icon" onclick="openCalculator()" style="background: linear-gradient(135deg, #ff9500 0%, #ff6000 100%);">
+    <div class="app-icon" onclick="openCalculator()" style="background: linear-gradient(135deg, #000000 0%, #000000 100%);">
       <div class="app-icon-emoji">🔢</div>
       <span>Calculadora</span>
     </div>
@@ -562,21 +552,7 @@
       </div>
 
       <div class="settings-item">
-        <label for="bgColor">Color de fondo (App Ajustes)</label>
-        <input type="color" id="bgColor" onchange="changeBackgroundColor()">
-      </div>
-
-      <div class="settings-item">
-        <label for="language">Idioma</label>
-        <select id="language" onchange="changeLanguage()">
-          <option value="es">Español</option>
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-        </select>
-      </div>
-
-      <div class="settings-item">
-        <label>Cambiar fondo del menú de inicio</label>
+        <label>Fondo de Pantalla</label>
         <input type="file" accept="image/*" onchange="uploadCustomWallpaper(event)">
         <div class="wallpapers">
           <img src="https://i.pinimg.com/736x/af/c6/6d/afc66d9445a1bb8cfb40d1a1cfa5b33f.jpg" onclick="setWallpaper(this.src)">
@@ -588,6 +564,9 @@
       <div class="settings-item" onclick="openGeneral()">
         <label>General</label>
       </div>
+      <div class="settings-item" onclick="openGuide()">
+  <label>Guía de uso</label>
+</div>
 
     </div>
 
@@ -604,6 +583,53 @@
     </div>
     <div class="home-button" onclick="closeGeneral()"></div>
   </div>
+
+
+<div id="guide-screen" class="subscreen">
+  <div class="settings-header">Guía de uso</div>
+  <div class="settings-list">
+    <div class="settings-item">
+      <p style="line-height: 1.6;">
+        <strong>Bienvenido a optiOS</strong><br><br>
+        optiOS es un sistema operativo simulado con una experiencia visual similar a iOS, diseñado para experimentar una interfaz moderna, fluida y personalizable dentro del navegador.<br><br>
+
+        🔹 <strong>Interfaz principal:</strong><br>
+        Al iniciar, verás una cuadrícula con íconos de aplicaciones como Ajustes, Safari o Calculadora. Toca cualquiera para abrirla. Las animaciones brindan una experiencia de apertura fluida y realista.<br><br>
+
+        🔹 <strong>Cierre de aplicaciones:</strong><br>
+        Para cerrar cualquier app abierta, pulsa la barra inferior (el botón de inicio). Esto te regresará a la pantalla principal.<br><br>
+
+        🔹 <strong>Centro de control:</strong><br>
+        Puedes acceder a funciones rápidas como Wi-Fi, Bluetooth, modo Avión o “No molestar” tocando el ícono de batería en la parte superior derecha. Se abrirá una ventana lateral con controles interactivos.<br><br>
+
+        🔹 <strong>Aplicación de Ajustes:</strong><br>
+        Desde aquí puedes:<br>
+        - Activar o desactivar el modo oscuro.<br>
+        - Cambiar el fondo de pantalla por imágenes predeterminadas o cargar una imagen personalizada.<br>
+        - Entrar a secciones como “General” para ver información del sistema (nombre, versión, etc).<br>
+        - Acceder a esta guía de ayuda.<br><br>
+
+        🔹 <strong>Modo oscuro:</strong><br>
+        Al activarlo, el sistema cambia automáticamente los colores del fondo y elementos para ofrecerte una experiencia más cómoda en ambientes con poca luz.<br><br>
+
+        🔹 <strong>Navegador Safari:</strong><br>
+        Es un navegador web básico donde puedes ingresar URLs o hacer búsquedas directamente. El sistema detecta si es una dirección o una búsqueda y actúa en consecuencia.<br><br>
+
+        🔹 <strong>Calculadora:</strong><br>
+        Es una calculadora funcional con operaciones básicas (+, –, ×, ÷), porcentaje, cambio de signo, y limpieza de memoria. Funciona como una calculadora real.<br><br>
+
+        🔹 <strong>Animaciones:</strong><br>
+        Cada aplicación y transición está animada para simular la fluidez del sistema operativo real. Puedes usar esto como inspiración para proyectos de front-end o diseño de UX.<br><br>
+
+        Este sistema está en constante evolución. Puedes seguir agregando apps, configuraciones y funciones nuevas para personalizar aún más tu experiencia.<br><br>
+
+        🎉 ¡Explora libremente, experimenta y diviértete con optiOS!
+      </p>
+    </div>
+  </div>
+  <div class="home-button" onclick="closeGuide()"></div>
+</div>
+
 
   <!-- Pantalla Información -->
   <div id="info-screen" class="subscreen">
@@ -673,7 +699,7 @@
 
   <script>
     const settingsApp = document.getElementById("settings-app");
-    const generalScreen = document.getElementById("general-screen");
+    const generalScreen = document.getElementById("general-screen");    
     const infoScreen = document.getElementById("info-screen");
     const safariApp = document.getElementById("safari-app");
     const safariIframe = document.getElementById("safari-iframe");
@@ -814,6 +840,8 @@
         generalScreen.classList.remove("closing");
       }, 500);
     }
+
+
 
     function openInfo() {
       const rect = event.target.getBoundingClientRect();
@@ -1028,6 +1056,36 @@
       }
       updateCalcDisplay();
     }
+
+
+
+
+
+
+    function openGuide() {
+  const rect = event.target.getBoundingClientRect();
+  const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+  const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+
+  const guideScreen = document.getElementById("guide-screen");
+  guideScreen.style.setProperty('--origin-x', centerX + '%');
+  guideScreen.style.setProperty('--origin-y', centerY + '%');
+
+  setTimeout(() => {
+    guideScreen.classList.add("active");
+    guideScreen.classList.remove("closing");
+  }, 50);
+}
+
+function closeGuide() {
+  const guideScreen = document.getElementById("guide-screen");
+  guideScreen.classList.add("closing");
+  setTimeout(() => {
+    guideScreen.classList.remove("active");
+    guideScreen.classList.remove("closing");
+  }, 500);
+}
+
   </script>
 </body>
 </html>
