@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>optiOS</title>
+  <style>
+    :root {
+      --bg-color: #f2f2f7;
+      --text-color: #000;
+      --item-color: #fff;
+      --status-bar-bg: rgba(255, 255, 255, 0.8);
+      --status-bar-text: #000;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1c1c1e;
+      --text-color: #fff;
+      --item-color: #2c2c2e;
+      --status-bar-bg: rgba(28, 28, 30, 0.8);
+      --status-bar-text: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: url('https://i.imgur.com/IOa4yng.jpg') no-repeat center center;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: var(--status-bar-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 15px;
+      color: var(--status-bar-text);
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 100;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    /* Control Center */
+    .control-center {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 380px;
+      max-width: 90vw;
+      height: 100vh;
+      background: rgba(28, 28, 30, 0.95);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      padding: 60px 20px 20px 20px;
+      z-index: 200;
+      transition: right 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+    }
+
+    .control-center.active {
+      right: 0;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .control-item {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      color: white;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .control-item:active {
+      transform: scale(0.95);
+    }
+
+    .control-item.active {
+      background: rgba(0, 122, 255, 0.8);
+    }
+
+    .control-item-icon {
+      font-size: 28px;
+    }
+
+    .control-item-label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .brightness-slider {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .brightness-slider input {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.3);
+      outline: none;
+    }
+
+    .brightness-slider input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+    }
+
+    .springboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 60px 20px 100px 20px;
+      justify-items: center;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .app-icon {
+      width: 70px;
+      height: 70px;
+      background: #ccc;
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      text-align: center;
+      cursor: pointer;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: transform 0.2s, opacity 0.2s;
+      position: relative;
+    }
+
+    .app-icon:active {
+      transform: scale(0.85);
+    }
+
+    .app-icon.launching {
+      transform: scale(1.1);
+      opacity: 0;
+    }
+
+    .app-icon span {
+      color: #fff;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .app-icon-emoji {
+      font-size: 35px;
+      margin-bottom: 5px;
+    }
+
+    #settings-app,
+    .subscreen {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100vw; 
+      height: 100vh;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.01);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.42, 0, 0.275, 1.155), 
+                  opacity 0.3s ease;
+      transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
+      border-radius: 40px;
+      overflow: hidden;
+      z-index: 150;
+    }
+
+    #settings-app.active,
+    .subscreen.active {
+      transform: scale(1);
+      opacity: 1;
+      pointer-events: all;
+      border-radius: 0;
+    }
+
+    #settings-app.closing,
+    .subscreen.closing {
+      transform: scale(0.01);
+      opacity: 0;
+      border-radius: 40px;
+    }
+
+    .settings-header {
+      background: var(--item-color);
+      padding: 16px;
+      padding-top: 60px;
+      font-weight: bold;
+      font-size: 28px;
+      text-align: left;
+      padding-left: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .settings-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .settings-item {
+      background: var(--item-color);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .settings-item:active {
+      transform: scale(0.98);
+    }
+
+    label, select, input[type="file"] {
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .wallpapers {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .wallpapers img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s;
+    }
+
+    .wallpapers img:hover {
+      border-color: #007aff;
+      transform: scale(1.05);
+    }
+
+    .home-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 5px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 160;
+      transition: transform 0.2s;
+    }
+
+    .home-button:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 199;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Safari Styles */
+    .safari-header {
+      background: var(--item-color);
+      padding-top: 50px;
+      padding-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .safari-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 15px;
+    }
+
+    .safari-btn {
+      background: rgba(0, 122, 255, 0.1);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #007aff;
+      transition: background 0.2s;
+    }
+
+    .safari-btn:active {
+      background: rgba(0, 122, 255, 0.2);
+    }
+
+    .safari-search-container {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      background: var(--bg-color);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .safari-search {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      outline: none;
+      color: var(--text-color);
+    }
+
+    .safari-go-btn {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .safari-go-btn:active {
+      background: #0051cc;
+    }
+
+    .safari-content {
+      flex: 1;
+      overflow: hidden;
+      background: white;
+    }
+
+    /* Calculator Styles */
+    #calculator-app {
+      background: #000;
+    }
+
+    .calc-display {
+      padding: 60px 20px 20px 20px;
+      text-align: right;
+      font-size: 64px;
+      font-weight: 200;
+      color: white;
+      min-height: 180px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+
+    .calc-buttons {
+      padding: 15px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      flex: 1;
+      align-content: center;
+      max-height: calc(100vh - 250px);
+    }
+
+    .calc-btn {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: none;
+      font-size: 28px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      color: white;
+      max-width: 85px;
+      max-height: 85px;
+      justify-self: center;
+    }
+
+    .calc-btn:active {
+      opacity: 0.5;
+    }
+
+    .calc-btn-number {
+      background: #333;
+    }
+
+    .calc-btn-operator {
+      background: #ff9500;
+      font-size: 36px;
+    }
+
+    .calc-btn-function {
+      background: #a5a5a5;
+      color: #000;
+    }
+
+    .calc-btn-zero {
+      grid-column: span 2;
+      border-radius: 50px;
+      aspect-ratio: auto;
+      max-width: 180px;
+      width: 100%;
+      text-align: left;
+      padding-left: 32px;
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-left">
+      <span id="time">9:41</span>
+    </div>
+    <div class="status-right" onclick="toggleControlCenter()">
+      <span>📶</span>
+      <span>📡</span>
+      <span id="battery">🔋 100%</span>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="closeControlCenter()"></div>
+
+  <!-- Control Center -->
+  <div class="control-center" id="control-center">
+    <div class="control-grid">
+      <div class="control-item" onclick="toggleItem(this, 'wifi')">
+        <div>
+          <div class="control-item-icon">📡</div>
+          <div class="control-item-label">Wi-Fi</div>
+        </div>
+      </div>
+      <div class="control-item" onclick="toggleItem(this, 'bluetooth')">
+        <div>
+          <div class="control-item-icon">🔵</div>
+          <div class="control-item-label">Bluetooth</div>
+        </div>
+      </div>
+      <div class="control-item" onclick="toggleItem(this, 'airplane')">
+        <div>
+          <div class="control-item-icon">✈️</div>
+          <div class="control-item-label">Avión</div>
+        </div>
+      </div>
+      <div class="control-item" onclick="toggleItem(this, 'focus')">
+        <div>
+          <div class="control-item-icon">🌙</div>
+          <div class="control-item-label">No molestar</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="brightness-slider">
+      <div style="color: white; font-size: 12px; margin-bottom: 10px;">☀️ Brillo</div>
+      <input type="range" min="20" max="100" value="100" id="brightness-slider" oninput="adjustBrightness(this.value)">
+    </div>
+    
+    <div class="brightness-slider">
+      <div style="color: white; font-size: 12px; margin-bottom: 10px;">🔊 Volumen</div>
+      <input type="range" min="0" max="100" value="50" id="volume-slider">
+    </div>
+  </div>
+
+  <!-- Pantalla principal -->
+  <div class="springboard" id="springboard">
+    <div class="app-icon" onclick="openSettings()">
+      <div class="app-icon-emoji">⚙️</div>
+      <span>Ajustes</span>
+    </div>
+    <div class="app-icon" onclick="openSafari()" style="background: linear-gradient(135deg, #00aaff 0%, #0077cc 100%);">
+      <div class="app-icon-emoji">🧭</div>
+      <span>Safari</span>
+    </div>
+    <div class="app-icon" onclick="openCalculator()" style="background: linear-gradient(135deg, #ff9500 0%, #ff6000 100%);">
+      <div class="app-icon-emoji">🔢</div>
+      <span>Calculadora</span>
+    </div>
+  </div>
+
+  <!-- App Ajustes -->
+  <div id="settings-app">
+    <div class="settings-header">Ajustes</div>
+    <div class="settings-list">
+
+      <div class="settings-item">
+        <label for="darkMode">Modo oscuro</label>
+        <input type="checkbox" id="darkMode" onchange="toggleDarkMode()">
+      </div>
+
+      <div class="settings-item">
+        <label for="bgColor">Color de fondo (App Ajustes)</label>
+        <input type="color" id="bgColor" onchange="changeBackgroundColor()">
+      </div>
+
+      <div class="settings-item">
+        <label for="language">Idioma</label>
+        <select id="language" onchange="changeLanguage()">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+
+      <div class="settings-item">
+        <label>Cambiar fondo del menú de inicio</label>
+        <input type="file" accept="image/*" onchange="uploadCustomWallpaper(event)">
+        <div class="wallpapers">
+          <img src="https://i.pinimg.com/736x/af/c6/6d/afc66d9445a1bb8cfb40d1a1cfa5b33f.jpg" onclick="setWallpaper(this.src)">
+          <img src="https://wallpapers.com/images/featured/iphone-wltnz5o1xymafqmo.jpg" onclick="setWallpaper(this.src)">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiUmN6zh-PyruRsLo1d0nJjFnMsFuGQw_suA&s" onclick="setWallpaper(this.src)">
+        </div>
+      </div>
+
+      <div class="settings-item" onclick="openGeneral()">
+        <label>General</label>
+      </div>
+
+    </div>
+
+    <div class="home-button" onclick="closeSettings()"></div>
+  </div>
+
+  <!-- Pantalla General -->
+  <div id="general-screen" class="subscreen">
+    <div class="settings-header">General</div>
+    <div class="settings-list">
+      <div class="settings-item" onclick="openInfo()">
+        <label>Información</label>
+      </div>
+    </div>
+    <div class="home-button" onclick="closeGeneral()"></div>
+  </div>
+
+  <!-- Pantalla Información -->
+  <div id="info-screen" class="subscreen">
+    <div class="settings-header">Información</div>
+    <div class="settings-list">
+      <div class="settings-item">
+        <strong>Nombre del sistema:</strong>
+        <span>optiOS</span>
+      </div>
+      <div class="settings-item">
+        <strong>Versión:</strong>
+        <span>16.1</span>
+      </div>
+    </div>
+    <div class="home-button" onclick="closeInfo()"></div>
+  </div>
+
+  <!-- App Safari -->
+  <div id="safari-app" class="subscreen">
+    <div class="safari-header">
+      <div class="safari-toolbar">
+        <button class="safari-btn" onclick="safariBack()">←</button>
+        <button class="safari-btn" onclick="safariForward()">→</button>
+        <button class="safari-btn" onclick="safariReload()">⟳</button>
+        <div class="safari-search-container">
+          <input type="text" id="safari-url" class="safari-search" placeholder="Buscar o ingresar sitio web" onkeypress="safariNavigate(event)">
+          <button class="safari-go-btn" onclick="safariGo()">Ir</button>
+        </div>
+      </div>
+    </div>
+    <div class="safari-content">
+      <iframe id="safari-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+    <div class="home-button" onclick="closeSafari()"></div>
+  </div>
+
+  <!-- App Calculadora -->
+  <div id="calculator-app" class="subscreen">
+    <div class="calc-display" id="calc-display">0</div>
+    <div class="calc-buttons">
+      <button class="calc-btn calc-btn-function" onclick="calcFunction('AC')">AC</button>
+      <button class="calc-btn calc-btn-function" onclick="calcFunction('±')">±</button>
+      <button class="calc-btn calc-btn-function" onclick="calcFunction('%')">%</button>
+      <button class="calc-btn calc-btn-operator" onclick="calcOperator('÷')">÷</button>
+      
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('7')">7</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('8')">8</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('9')">9</button>
+      <button class="calc-btn calc-btn-operator" onclick="calcOperator('×')">×</button>
+      
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('4')">4</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('5')">5</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('6')">6</button>
+      <button class="calc-btn calc-btn-operator" onclick="calcOperator('-')">−</button>
+      
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('1')">1</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('2')">2</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('3')">3</button>
+      <button class="calc-btn calc-btn-operator" onclick="calcOperator('+')">+</button>
+      
+      <button class="calc-btn calc-btn-number calc-btn-zero" onclick="calcNumber('0')">0</button>
+      <button class="calc-btn calc-btn-number" onclick="calcNumber('.')">.</button>
+      <button class="calc-btn calc-btn-operator" onclick="calcEquals()">=</button>
+    </div>
+    <div class="home-button" onclick="closeCalculator()"></div>
+  </div>
+
+  <script>
+    const settingsApp = document.getElementById("settings-app");
+    const generalScreen = document.getElementById("general-screen");
+    const infoScreen = document.getElementById("info-screen");
+    const safariApp = document.getElementById("safari-app");
+    const safariIframe = document.getElementById("safari-iframe");
+    const safariUrlInput = document.getElementById("safari-url");
+    const calculatorApp = document.getElementById("calculator-app");
+    const calcDisplay = document.getElementById("calc-display");
+    const controlCenter = document.getElementById("control-center");
+    const overlay = document.getElementById("overlay");
+    const body = document.body;
+
+    // Calculator variables
+    let calcCurrentValue = '0';
+    let calcPreviousValue = null;
+    let calcOperation = null;
+    let calcNewNumber = true;
+
+    // Actualizar hora
+    function updateTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('time').textContent = `${hours}:${minutes}`;
+    }
+    updateTime();
+    setInterval(updateTime, 60000);
+
+    // Control Center
+    function toggleControlCenter() {
+      controlCenter.classList.toggle("active");
+      overlay.classList.toggle("active");
+    }
+
+    function closeControlCenter() {
+      controlCenter.classList.remove("active");
+      overlay.classList.remove("active");
+    }
+
+    function toggleItem(element, type) {
+      element.classList.toggle("active");
+    }
+
+    function adjustBrightness(value) {
+      document.body.style.filter = `brightness(${value}%)`;
+    }
+
+    // Settings App
+    function openSettings() {
+      const icon = event.target.closest('.app-icon');
+      const rect = icon.getBoundingClientRect();
+      const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+      const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+      
+      settingsApp.style.setProperty('--origin-x', centerX + '%');
+      settingsApp.style.setProperty('--origin-y', centerY + '%');
+      
+      icon.classList.add('launching');
+      setTimeout(() => {
+        settingsApp.classList.add("active");
+        settingsApp.classList.remove("closing");
+      }, 100);
+      
+      setTimeout(() => {
+        icon.classList.remove('launching');
+      }, 600);
+    }
+
+    function closeSettings() {
+      settingsApp.classList.add("closing");
+      setTimeout(() => {
+        settingsApp.classList.remove("active");
+        settingsApp.classList.remove("closing");
+      }, 500);
+    }
+
+    function toggleDarkMode() {
+      const isDark = body.getAttribute("data-theme") === "dark";
+      body.setAttribute("data-theme", isDark ? "light" : "dark");
+    }
+
+    function changeBackgroundColor() {
+      const color = document.getElementById("bgColor").value;
+      settingsApp.style.backgroundColor = color;
+    }
+
+    function changeLanguage() {
+      const lang = document.getElementById("language").value;
+      const labels = {
+        es: ["Modo oscuro", "Color de fondo (App Ajustes)", "Idioma", "Cambiar fondo del menú de inicio", "General", "Información"],
+        en: ["Dark Mode", "Background Color (Settings)", "Language", "Change Home Screen Wallpaper", "General", "Information"],
+        fr: ["Mode sombre", "Couleur de fond (Réglages)", "Langue", "Changer le fond d'écran d'accueil", "Général", "Informations"]
+      };
+
+      const texts = document.querySelectorAll(".settings-item label");
+      texts.forEach((el, i) => {
+        el.textContent = labels[lang][i] || el.textContent;
+      });
+
+      const header = document.querySelector(".settings-header");
+      if (header) {
+        header.textContent = lang === "es" ? "Ajustes" : lang === "en" ? "Settings" : "Paramètres";
+      }
+    }
+
+    function setWallpaper(src) {
+      document.body.style.background = `url('${src}') no-repeat center center`;
+      document.body.style.backgroundSize = "cover";
+    }
+
+    function uploadCustomWallpaper(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          setWallpaper(e.target.result);
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function openGeneral() {
+      const rect = event.target.getBoundingClientRect();
+      const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+      const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+      
+      generalScreen.style.setProperty('--origin-x', centerX + '%');
+      generalScreen.style.setProperty('--origin-y', centerY + '%');
+      
+      setTimeout(() => {
+        generalScreen.classList.add("active");
+        generalScreen.classList.remove("closing");
+      }, 50);
+    }
+
+    function closeGeneral() {
+      generalScreen.classList.add("closing");
+      setTimeout(() => {
+        generalScreen.classList.remove("active");
+        generalScreen.classList.remove("closing");
+      }, 500);
+    }
+
+    function openInfo() {
+      const rect = event.target.getBoundingClientRect();
+      const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+      const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+      
+      infoScreen.style.setProperty('--origin-x', centerX + '%');
+      infoScreen.style.setProperty('--origin-y', centerY + '%');
+      
+      setTimeout(() => {
+        infoScreen.classList.add("active");
+        infoScreen.classList.remove("closing");
+      }, 50);
+    }
+
+    function closeInfo() {
+      infoScreen.classList.add("closing");
+      setTimeout(() => {
+        infoScreen.classList.remove("active");
+        infoScreen.classList.remove("closing");
+      }, 500);
+    }
+
+    // Safari Functions
+    function openSafari() {
+      const icon = event.target.closest('.app-icon');
+      const rect = icon.getBoundingClientRect();
+      const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+      const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+      
+      safariApp.style.setProperty('--origin-x', centerX + '%');
+      safariApp.style.setProperty('--origin-y', centerY + '%');
+      
+      icon.classList.add('launching');
+      setTimeout(() => {
+        safariApp.classList.add("active");
+        safariApp.classList.remove("closing");
+        // Cargar página por defecto
+        if (!safariIframe.src) {
+          safariIframe.src = "https://www.google.com/webhp?igu=1";
+          safariUrlInput.value = "google.com";
+        }
+      }, 100);
+      
+      setTimeout(() => {
+        icon.classList.remove('launching');
+      }, 600);
+    }
+
+    function closeSafari() {
+      safariApp.classList.add("closing");
+      setTimeout(() => {
+        safariApp.classList.remove("active");
+        safariApp.classList.remove("closing");
+      }, 500);
+    }
+
+    function safariNavigate(event) {
+      if (event.key === 'Enter') {
+        safariGo();
+      }
+    }
+
+    function safariGo() {
+      let url = safariUrlInput.value.trim();
+      if (!url) return;
+      
+      // Si no tiene protocolo, agregarlo
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        // Si parece una búsqueda, usar Google
+        if (!url.includes('.') || url.includes(' ')) {
+          url = 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(url);
+        } else {
+          url = 'https://' + url;
+        }
+      }
+      
+      safariIframe.src = url;
+      safariUrlInput.value = url.replace('https://', '').replace('http://', '');
+    }
+
+    function safariBack() {
+      try {
+        window.history.back();
+      } catch(e) {
+        console.log('No se puede retroceder');
+      }
+    }
+
+    function safariForward() {
+      try {
+        window.history.forward();
+      } catch(e) {
+        console.log('No se puede avanzar');
+      }
+    }
+
+    function safariReload() {
+      safariIframe.src = safariIframe.src;
+    }
+
+    // Calculator Functions
+    function openCalculator() {
+      const icon = event.target.closest('.app-icon');
+      const rect = icon.getBoundingClientRect();
+      const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+      const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+      
+      calculatorApp.style.setProperty('--origin-x', centerX + '%');
+      calculatorApp.style.setProperty('--origin-y', centerY + '%');
+      
+      icon.classList.add('launching');
+      setTimeout(() => {
+        calculatorApp.classList.add("active");
+        calculatorApp.classList.remove("closing");
+      }, 100);
+      
+      setTimeout(() => {
+        icon.classList.remove('launching');
+      }, 600);
+    }
+
+    function closeCalculator() {
+      calculatorApp.classList.add("closing");
+      setTimeout(() => {
+        calculatorApp.classList.remove("active");
+        calculatorApp.classList.remove("closing");
+      }, 500);
+    }
+
+    function updateCalcDisplay() {
+      const displayValue = parseFloat(calcCurrentValue);
+      if (calcCurrentValue.length > 9) {
+        calcDisplay.style.fontSize = '50px';
+      } else if (calcCurrentValue.length > 7) {
+        calcDisplay.style.fontSize = '60px';
+      } else {
+        calcDisplay.style.fontSize = '80px';
+      }
+      calcDisplay.textContent = calcCurrentValue;
+    }
+
+    function calcNumber(num) {
+      if (calcNewNumber) {
+        calcCurrentValue = num;
+        calcNewNumber = false;
+      } else {
+        if (calcCurrentValue === '0' && num !== '.') {
+          calcCurrentValue = num;
+        } else {
+          if (num === '.' && calcCurrentValue.includes('.')) return;
+          calcCurrentValue += num;
+        }
+      }
+      updateCalcDisplay();
+    }
+
+    function calcOperator(op) {
+      if (calcOperation !== null && !calcNewNumber) {
+        calcEquals();
+      }
+      calcPreviousValue = parseFloat(calcCurrentValue);
+      calcOperation = op;
+      calcNewNumber = true;
+    }
+
+    function calcEquals() {
+      if (calcOperation === null || calcPreviousValue === null) return;
+      
+      const current = parseFloat(calcCurrentValue);
+      let result = 0;
+      
+      switch(calcOperation) {
+        case '+':
+          result = calcPreviousValue + current;
+          break;
+        case '-':
+          result = calcPreviousValue - current;
+          break;
+        case '×':
+          result = calcPreviousValue * current;
+          break;
+        case '÷':
+          result = calcPreviousValue / current;
+          break;
+      }
+      
+      calcCurrentValue = result.toString();
+      if (calcCurrentValue.length > 9) {
+        calcCurrentValue = result.toExponential(5);
+      }
+      calcOperation = null;
+      calcPreviousValue = null;
+      calcNewNumber = true;
+      updateCalcDisplay();
+    }
+
+    function calcFunction(func) {
+      switch(func) {
+        case 'AC':
+          calcCurrentValue = '0';
+          calcPreviousValue = null;
+          calcOperation = null;
+          calcNewNumber = true;
+          break;
+        case '±':
+          calcCurrentValue = (parseFloat(calcCurrentValue) * -1).toString();
+          break;
+        case '%':
+          calcCurrentValue = (parseFloat(calcCurrentValue) / 100).toString();
+          break;
+      }
+      updateCalcDisplay();
+    }
+  </script>
+</body>
+</html>
