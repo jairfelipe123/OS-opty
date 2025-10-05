@@ -539,6 +539,29 @@
       <div class="app-icon-emoji">🔢</div>
       <span>Calculadora</span>
     </div>
+    <div class="app-icon" onclick="openOptiMusic()" style="background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);">
+  <div class="app-icon-emoji">🎵</div>
+  <span>OptiMusic</span>
+</div>
+
+
+<div class="app-icon" onclick="notas()" style="background: linear-gradient(135deg, #71706e 0%, #4e4b4b 100%);">
+  <div class="app-icon-emoji">🗒️</div>
+  <span>OptiNotas</span>
+</div>
+
+
+<div class="app-icon" onclick="openReloj()" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+  <div class="app-icon-emoji">⏰</div>
+  <span>Reloj</span>
+</div>
+
+
+<div class="app-icon" onclick="openGoogleMapa()" style="background: linear-gradient(135deg, #34a853 0%, #4285f4 100%);">
+  <div class="app-icon-emoji">🗺️</div>
+  <span>Google Mapa</span>
+</div>
+
   </div>
 
   <!-- App Ajustes -->
@@ -633,6 +656,75 @@
     </div>
   </div>
   <div class="home-button" onclick="closeGuide()"></div>
+</div>
+
+
+<div id="optimusic-app" class="subscreen">
+  <div class="settings-header">OptiMusic</div>
+  <div class="settings-list">
+    <div class="settings-item">
+      <label for="musicFiles">🎶 ¡Selecciona tus canciones favoritas!</label>
+      <input type="file" id="musicFiles" accept="audio/*" multiple onchange="handleMusicFiles(event)">
+    </div>
+
+    <div class="settings-item">
+      <label>🎧 Lista de reproducción:</label>
+      <ul id="musicList" style="padding-left: 20px;"></ul>
+    </div>
+
+    <div class="settings-item">
+      <audio id="musicPlayer" controls style="width: 100%;">
+        Tu navegador no soporta el elemento de audio.
+      </audio>
+    </div>
+  </div>
+  <div class="home-button" onclick="closeOptiMusic()"></div>
+</div>
+
+
+<div id="notas-app" class="subscreen">
+  <div class="settings-header">Notas</div>
+  <div class="settings-list">
+    <div class="settings-item">
+      <label for="noteArea">📝 Escribe tus notas:</label>
+      <textarea id="noteArea" placeholder="Escribe aquí..." style="width: 100%; height: 200px; resize: none;"></textarea>
+    </div>
+    <div class="settings-item">
+      <button onclick="guardarNota()" style="width: 100%;">💾 Guardar Nota</button>
+    </div>
+  </div>
+  <div class="home-button" onclick="closeNotas()"></div>
+</div>
+
+
+<div id="reloj-app" class="subscreen">
+  <div class="settings-header">Reloj</div>
+  <div class="settings-list">
+    <div class="settings-item" style="text-align: center;">
+      <h1 id="reloj-hora" style="font-size: 48px; margin: 20px 0;">--:--:--</h1>
+      <p>🕒 Hora actual actualizada en tiempo real</p>
+    </div>
+  </div>
+  <div class="home-button" onclick="closeReloj()"></div>
+</div>
+
+
+
+
+
+
+
+<div id="googlemapa-app" class="subscreen">
+  <div class="settings-header">Google Mapa</div>
+  <div class="settings-list">
+    <div class="settings-item" style="height: 400px; padding: 0;">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.739112092319!2d-74.08175368461397!3d4.609710543476287!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99c908041715%3A0x402b5bdb621c80a5!2sBogotá%2C%20Colombia!5e0!3m2!1ses-419!2sco!4v1600000000000!5m2!1ses-419!2sco"
+        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+      </iframe>
+    </div>
+  </div>
+  <div class="home-button" onclick="closeGoogleMapa()"></div>
 </div>
 
 
@@ -1090,6 +1182,243 @@ function closeGuide() {
     guideScreen.classList.remove("closing");
   }, 500);
 }
+
+
+
+
+function openOptiMusic() {
+  const icon = event.target.closest('.app-icon');
+  const rect = icon.getBoundingClientRect();
+  const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+  const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+
+  const app = document.getElementById("optimusic-app");
+  app.style.setProperty('--origin-x', centerX + '%');
+  app.style.setProperty('--origin-y', centerY + '%');
+
+  icon.classList.add('launching');
+  setTimeout(() => {
+    app.classList.add("active");
+    app.classList.remove("closing");
+  }, 100);
+  setTimeout(() => {
+    icon.classList.remove('launching');
+  }, 600);
+}
+
+function closeOptiMusic() {
+  const app = document.getElementById("optimusic-app");
+  app.classList.add("closing");
+  setTimeout(() => {
+    app.classList.remove("active");
+    app.classList.remove("closing");
+  }, 500);
+}
+
+
+function handleMusicFiles(event) {
+  const files = event.target.files;
+  const listEl = document.getElementById("musicList");
+  const player = document.getElementById("musicPlayer");
+  listEl.innerHTML = "";
+
+  if (!files.length) {
+    listEl.innerHTML = "<li>No se seleccionaron canciones</li>";
+    return;
+  }
+
+  Array.from(files).forEach(file => {
+    const li = document.createElement("li");
+    li.textContent = file.name;
+    li.style.cursor = "pointer";
+
+    li.onclick = () => {
+      const url = URL.createObjectURL(file);
+      player.src = url;
+      player.play();
+    };
+
+    listEl.appendChild(li);
+  });
+}
+
+
+function handleMusicFiles(event) {
+  const files = event.target.files;
+  const listEl = document.getElementById("musicList");
+  const player = document.getElementById("musicPlayer");
+  listEl.innerHTML = "";
+
+  if (!files.length) {
+    listEl.innerHTML = "<li>No se seleccionaron canciones</li>";
+    return;
+  }
+
+  Array.from(files).forEach(file => {
+    const li = document.createElement("li");
+    li.textContent = file.name;
+    li.style.cursor = "pointer";
+
+    li.onclick = () => {
+      const url = URL.createObjectURL(file);
+      player.src = url;
+      player.play();
+    };
+
+    listEl.appendChild(li);
+  });
+}
+
+
+
+function guardarNota() {
+  const nota = document.getElementById("noteArea").value;
+  localStorage.setItem("notaGuardada", nota);
+  alert("✅ Nota guardada correctamente.");
+}
+
+function cargarNota() {
+  const notaGuardada = localStorage.getItem("notaGuardada");
+  if (notaGuardada !== null) {
+    document.getElementById("noteArea").value = notaGuardada;
+  }
+}
+
+function openNotas() {
+  const icon = event.target.closest('.app-icon');
+  const rect = icon.getBoundingClientRect();
+  const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+  const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+
+  const app = document.getElementById("notas-app");
+  app.style.setProperty('--origin-x', centerX + '%');
+  app.style.setProperty('--origin-y', centerY + '%');
+
+  icon.classList.add('launching');
+  setTimeout(() => {
+    app.classList.add("active");
+    app.classList.remove("closing");
+    cargarNota(); // cargar nota al abrir
+  }, 100);
+  setTimeout(() => {
+    icon.classList.remove('launching');
+  }, 600);
+}
+
+function closeNotas() {
+  const app = document.getElementById("notas-app");
+  app.classList.add("closing");
+  setTimeout(() => {
+    app.classList.remove("active");
+    app.classList.remove("closing");
+  }, 500);
+}
+
+function notas() {
+  const icon = event.target.closest('.app-icon');
+  const rect = icon.getBoundingClientRect();
+  const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+  const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+
+  const app = document.getElementById("notas-app");
+  app.style.setProperty('--origin-x', centerX + '%');
+  app.style.setProperty('--origin-y', centerY + '%');
+
+  icon.classList.add('launching');
+  setTimeout(() => {
+    app.classList.add("active");
+    app.classList.remove("closing");
+  }, 100);
+  setTimeout(() => {
+    icon.classList.remove('launching');
+  }, 600);
+}
+
+function closeOptiMusic() {
+  const app = document.getElementById("optimusic-app");
+  app.classList.add("closing");
+  setTimeout(() => {
+    app.classList.remove("active");
+    app.classList.remove("closing");
+  }, 500);
+}
+
+
+
+function actualizarReloj() {
+  const ahora = new Date();
+  const horas = ahora.getHours().toString().padStart(2, '0');
+  const minutos = ahora.getMinutes().toString().padStart(2, '0');
+  const segundos = ahora.getSeconds().toString().padStart(2, '0');
+  document.getElementById("reloj-hora").textContent = `${horas}:${minutos}:${segundos}`;
+}
+
+function iniciarReloj() {
+  actualizarReloj();
+  setInterval(actualizarReloj, 1000);
+}
+
+function openReloj() {
+  const icon = event.target.closest('.app-icon');
+  const rect = icon.getBoundingClientRect();
+  const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+  const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+
+  const app = document.getElementById("reloj-app");
+  app.style.setProperty('--origin-x', centerX + '%');
+  app.style.setProperty('--origin-y', centerY + '%');
+
+  icon.classList.add('launching');
+  setTimeout(() => {
+    app.classList.add("active");
+    app.classList.remove("closing");
+    iniciarReloj();
+  }, 100);
+  setTimeout(() => {
+    icon.classList.remove('launching');
+  }, 600);
+}
+
+function closeReloj() {
+  const app = document.getElementById("reloj-app");
+  app.classList.add("closing");
+  setTimeout(() => {
+    app.classList.remove("active");
+    app.classList.remove("closing");
+  }, 500);
+}
+
+
+function openGoogleMapa() {
+  const icon = event.target.closest('.app-icon');
+  const rect = icon.getBoundingClientRect();
+  const centerX = (rect.left + rect.width / 2) / window.innerWidth * 100;
+  const centerY = (rect.top + rect.height / 2) / window.innerHeight * 100;
+
+  const app = document.getElementById("googlemapa-app");
+  app.style.setProperty('--origin-x', centerX + '%');
+  app.style.setProperty('--origin-y', centerY + '%');
+
+  icon.classList.add('launching');
+  setTimeout(() => {
+    app.classList.add("active");
+    app.classList.remove("closing");
+  }, 100);
+  setTimeout(() => {
+    icon.classList.remove('launching');
+  }, 600);
+}
+
+function closeGoogleMapa() {
+  const app = document.getElementById("googlemapa-app");
+  app.classList.add("closing");
+  setTimeout(() => {
+    app.classList.remove("active");
+    app.classList.remove("closing");
+  }, 500);
+}
+
+
 
   </script>
 </body>
